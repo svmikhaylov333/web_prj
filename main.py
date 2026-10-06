@@ -1,16 +1,49 @@
-# This is a sample Python script.
 
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+host_name = "localhost"
+server_port = 8080
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+class MyServer(BaseHTTPRequestHandler):
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    def do_GET(self):
+        """Обрабатывает GET-запросы: возвращает страницу 'Контакты'."""
+
+        with open('home/contacts.html', 'r', encoding='utf-8') as file:
+            content = file.read()
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(content.encode('utf-8'))
+
+    def do_POST(self):
+        """принимает POST-запрос и печатает данные в консоль"""
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        print(f"Получен POST-запрос:{post_data}")
+
+        with open('home/contacts.html', 'r', encoding='utf-8') as file:
+            content = file.read()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(content.encode('utf-8'))
+
+
+
+
+
+if __name__ == "__main__":
+    web_server = HTTPServer((host_name, server_port), MyServer)  # type: ignore
+    print("Server started http://%s:%s" % (host_name, server_port))
+
+    try:
+        web_server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    web_server.server_close()
+    print("Server stopped.")

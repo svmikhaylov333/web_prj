@@ -19,6 +19,20 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content.encode('utf-8'))
 
+    def do_POST(self):
+        """принимает POST-запрос и печатает данные в консоль"""
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        print(f"Получен POST-запрос:{post_data}")
+
+        with open('home/contacts.html', 'r', encoding='utf-8') as file:
+            content = file.read()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(content.encode('utf-8'))
+
+
 
 
 
